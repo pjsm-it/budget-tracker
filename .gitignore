@@ -1,0 +1,14 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# SQLite database file
+budget.db
+
+# macOS system files
+.DS_Store
+
+# VS Code workspace settings
+.vscode/
