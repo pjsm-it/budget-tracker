@@ -1,6 +1,6 @@
 /**
  * @file app.js
- * @description Frontend logic for Budget Tracker MVP
+ * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements
  */
 
 const form = document.getElementById('transaction-form');
@@ -11,6 +11,11 @@ const API_URL = 'http://localhost:3000/transactions';
 
 // Global variable to store the transaction being edited
 let editingId = null;
+
+// Reference to the form submit button
+const submitButton = form.querySelector('button[type="submit"]');
+// Dynamic cancel button
+let cancelButton = null;
 
 /**
  * Fetch and display all transactions
@@ -41,6 +46,19 @@ async function loadTransactions() {
 }
 
 /**
+ * Reset form and editing state
+ */
+function resetForm() {
+  form.reset();
+  editingId = null;
+  submitButton.textContent = 'Add';
+  if (cancelButton) {
+    cancelButton.remove();
+    cancelButton = null;
+  }
+}
+
+/**
  * Handle form submission to add or update a transaction
  */
 form.addEventListener('submit', async (e) => {
@@ -53,16 +71,15 @@ form.addEventListener('submit', async (e) => {
     category: document.getElementById('category').value
   };
 
-  // If editingId exists, we are updating an existing transaction (PUT)
   if (editingId) {
+    // Update existing transaction
     await fetch(`${API_URL}/${editingId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(transaction)
     });
-    editingId = null; // Reset editing mode after update
   } else {
-    // Otherwise, create a new transaction (POST)
+    // Create new transaction
     await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -70,40 +87,45 @@ form.addEventListener('submit', async (e) => {
     });
   }
 
-  // Reset form fields after submission
-  form.reset();
-  // Reload transactions to reflect changes
+  // Reset form and reload transactions
+  resetForm();
   loadTransactions();
 });
 
 /**
  * Handle click events on transaction list
- * - Delete: remove a transaction
- * - Edit: pre-fill form for editing
  */
 transactionsList.addEventListener('click', async (e) => {
   const id = e.target.dataset.id;
 
   if (e.target.classList.contains('delete')) {
-    // Delete transaction via API
     await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    // Reload transactions to update DOM
     loadTransactions();
   }
 
   if (e.target.classList.contains('edit')) {
-    // Fetch the current transaction to pre-fill the form
     const res = await fetch(`${API_URL}/${id}`);
     const transaction = await res.json();
 
-    // Pre-fill form fields with existing transaction data
+    // Pre-fill form fields
     document.getElementById('description').value = transaction.description;
     document.getElementById('amount').value = transaction.amount;
     document.getElementById('type').value = transaction.type;
     document.getElementById('category').value = transaction.category;
 
-    // Set editingId to indicate we are in edit mode
+    // Set editing state
     editingId = id;
+    submitButton.textContent = 'Save';
+
+    // Create Cancel button dynamically if it doesn't exist
+    if (!cancelButton) {
+      cancelButton = document.createElement('button');
+      cancelButton.type = 'button';
+      cancelButton.textContent = 'Cancel';
+      cancelButton.style.marginLeft = '0.5rem'; // mantém o espaçamento
+      cancelButton.addEventListener('click', resetForm);
+      form.appendChild(cancelButton);
+    }
   }
 });
 
