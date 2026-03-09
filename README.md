@@ -33,6 +33,7 @@ The backend is Node.js + Express with SQLite (no ORM), and the frontend is vanil
 ---
 
 ## Project Structure
+```
 budget-tracker/
 ├── backend/
 │ ├── server.js ← Express server and API routes
@@ -43,7 +44,7 @@ budget-tracker/
 ├── index.html ← Page structure
 ├── style.css ← Styles
 └── app.js ← Frontend logic
-
+````
 
 ---
 
