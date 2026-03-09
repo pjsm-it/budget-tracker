@@ -69,6 +69,35 @@ app.post('/transactions', (req, res) => {
 });
 
 /**
+ * @route PUT /transactions/:id
+ * @description Update an existing transaction
+ */
+app.put('/transactions/:id', (req, res) => {
+  const { description, amount, type, category } = req.body;
+  const id = req.params.id;
+
+  const existing = db.prepare(
+    'SELECT * FROM transactions WHERE id = ?'
+  ).get(id);
+
+  if (!existing) {
+    return res.status(404).json({ error: 'Transaction not found' });
+  }
+
+  db.prepare(`
+    UPDATE transactions
+    SET description = ?, amount = ?, type = ?, category = ?
+    WHERE id = ?
+  `).run(description, Math.abs(amount), type, category, id);
+
+  const updated = db.prepare(
+    'SELECT * FROM transactions WHERE id = ?'
+  ).get(id);
+
+  res.json(updated);
+});
+
+/**
  * @route DELETE /transactions/:id
  * @description Delete a transaction by ID
  */
