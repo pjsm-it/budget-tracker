@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
+    "reset-db": "rm budget.db",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["budget", "tracker", "sqlite", "express", "javascript"],
+  "author": "Paulo Melo",
   "license": "ISC",
-  "description": "",
+  "description": "Backend for Budget Tracker MVP. Node.js + Express + SQLite.",
   "dependencies": {
     "better-sqlite3": "^9.4.3",
     "cors": "^2.8.5",
