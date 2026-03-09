@@ -52,14 +52,14 @@ budget-tracker/
 
 1. Clone the repository:
 
-git clone <repository-url>
-cd budget-tracker/backend
+* git clone <repository-url>
+* cd budget-tracker/backend
 
 2. Install dependencies:
-npm install
+* npm install
 
 3. Start the backend server:
-npm start
+* npm start
 
 4. Open frontend/index.html in your browser (double click or via Live Server).
 
