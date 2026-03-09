@@ -78,6 +78,7 @@ This deletes the current budget.db and creates a new empty database when the ser
 
 ## API Endpoints (MVP)
 
+```
 API Endpoints (MVP)
 Method  Route               Description
 GET	    /transactions	    List all transactions
@@ -85,6 +86,7 @@ GET	    /transactions/:id	Get a transaction by ID
 POST	/transactions	    Create a new transaction
 PUT	    /transactions/:id	Update an existing transaction
 DELETE	/transactions/:id	Delete a transaction
+```
 
 ---
 
