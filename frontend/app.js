@@ -1,21 +1,16 @@
 /**
  * @file app.js
- * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and filters by type and category (RF02 & RF03)
+ * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and delete confirmation
  */
 
 const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const totalBalance = document.getElementById('total-balance');
-const filterType = document.getElementById('filter-type');
-const filterCategory = document.getElementById('filter-category');
 
 const API_URL = 'http://localhost:3000/transactions';
 
 // Global variable to store the transaction being edited
 let editingId = null;
-
-// Store all transactions in memory for filtering
-let allTransactions = [];
 
 // Reference to the form submit button
 const submitButton = form.querySelector('button[type="submit"]');
@@ -27,45 +22,14 @@ let cancelButton = null;
  */
 async function loadTransactions() {
   const res = await fetch(API_URL);
-  allTransactions = await res.json();
-  populateCategoryFilter();
-  renderTransactions();
-}
+  const transactions = await res.json();
 
-/**
- * Populate category filter based on transactions
- */
-function populateCategoryFilter() {
-  // Get unique categories
-  const categories = Array.from(new Set(allTransactions.map(t => t.category)));
-  filterCategory.innerHTML = '<option value="all">All</option>';
-  categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
-    filterCategory.appendChild(option);
-  });
-}
-
-/**
- * Render transactions based on current filters and update balance
- */
-function renderTransactions() {
   // Clear the transactions list before rendering
   transactionsList.innerHTML = '';
 
-  const typeFilter = filterType.value;
-  const categoryFilter = filterCategory.value;
-
-  const filteredTransactions = allTransactions.filter(t => {
-    const typeMatch = typeFilter === 'all' ? true : t.type === typeFilter;
-    const categoryMatch = categoryFilter === 'all' ? true : t.category === categoryFilter;
-    return typeMatch && categoryMatch;
-  });
-
   let balance = 0;
 
-  filteredTransactions.forEach(t => {
+  transactions.forEach(t => {
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${t.description} - ${t.category} - $${t.amount} (${t.type})</span>
@@ -135,8 +99,14 @@ transactionsList.addEventListener('click', async (e) => {
   const id = e.target.dataset.id;
 
   if (e.target.classList.contains('delete')) {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    loadTransactions();
+    /**
+     * @description Confirm before deleting a transaction
+     * @example if (confirm("Are you sure?")) { ... }
+     */
+    if (confirm('Are you sure you want to delete this transaction?')) {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      loadTransactions();
+    }
   }
 
   if (e.target.classList.contains('edit')) {
@@ -162,17 +132,6 @@ transactionsList.addEventListener('click', async (e) => {
       cancelButton.addEventListener('click', resetForm);
     }
   }
-});
-
-/**
- * Handle filter change to update displayed transactions
- */
-filterType.addEventListener('change', () => {
-  renderTransactions();
-});
-
-filterCategory.addEventListener('change', () => {
-  renderTransactions();
 });
 
 // Initial load of transactions on page load
