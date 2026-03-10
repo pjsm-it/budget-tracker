@@ -122,9 +122,9 @@ transactionsList.addEventListener('click', async (e) => {
       cancelButton = document.createElement('button');
       cancelButton.type = 'button';
       cancelButton.textContent = 'Cancel';
-      cancelButton.style.marginLeft = '0.5rem'; // mantém o espaçamento
-      cancelButton.addEventListener('click', resetForm);
+      // Remove style inline e usa CSS consistente
       form.appendChild(cancelButton);
+      cancelButton.addEventListener('click', resetForm);
     }
   }
 });
