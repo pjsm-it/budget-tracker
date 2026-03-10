@@ -1,16 +1,20 @@
 /**
  * @file app.js
- * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements
+ * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and filter by type (RF02)
  */
 
 const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const totalBalance = document.getElementById('total-balance');
+const filterType = document.getElementById('filter-type');
 
 const API_URL = 'http://localhost:3000/transactions';
 
 // Global variable to store the transaction being edited
 let editingId = null;
+
+// Store all transactions in memory for filtering
+let allTransactions = [];
 
 // Reference to the form submit button
 const submitButton = form.querySelector('button[type="submit"]');
@@ -22,14 +26,25 @@ let cancelButton = null;
  */
 async function loadTransactions() {
   const res = await fetch(API_URL);
-  const transactions = await res.json();
+  allTransactions = await res.json();
+  renderTransactions();
+}
 
+/**
+ * Render transactions based on current filter and update balance
+ */
+function renderTransactions() {
   // Clear the transactions list before rendering
   transactionsList.innerHTML = '';
 
+  const filterValue = filterType.value;
+  const filteredTransactions = allTransactions.filter(t => {
+    return filterValue === 'all' ? true : t.type === filterValue;
+  });
+
   let balance = 0;
 
-  transactions.forEach(t => {
+  filteredTransactions.forEach(t => {
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${t.description} - ${t.category} - $${t.amount} (${t.type})</span>
@@ -122,11 +137,17 @@ transactionsList.addEventListener('click', async (e) => {
       cancelButton = document.createElement('button');
       cancelButton.type = 'button';
       cancelButton.textContent = 'Cancel';
-      // Remove style inline e usa CSS consistente
       form.appendChild(cancelButton);
       cancelButton.addEventListener('click', resetForm);
     }
   }
+});
+
+/**
+ * Handle filter change to update displayed transactions
+ */
+filterType.addEventListener('change', () => {
+  renderTransactions();
 });
 
 // Initial load of transactions on page load
