@@ -1,12 +1,13 @@
 /**
  * @file app.js
- * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and filter by type (RF02)
+ * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and filters by type and category (RF02 & RF03)
  */
 
 const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const totalBalance = document.getElementById('total-balance');
 const filterType = document.getElementById('filter-type');
+const filterCategory = document.getElementById('filter-category');
 
 const API_URL = 'http://localhost:3000/transactions';
 
@@ -27,19 +28,39 @@ let cancelButton = null;
 async function loadTransactions() {
   const res = await fetch(API_URL);
   allTransactions = await res.json();
+  populateCategoryFilter();
   renderTransactions();
 }
 
 /**
- * Render transactions based on current filter and update balance
+ * Populate category filter based on transactions
+ */
+function populateCategoryFilter() {
+  // Get unique categories
+  const categories = Array.from(new Set(allTransactions.map(t => t.category)));
+  filterCategory.innerHTML = '<option value="all">All</option>';
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    filterCategory.appendChild(option);
+  });
+}
+
+/**
+ * Render transactions based on current filters and update balance
  */
 function renderTransactions() {
   // Clear the transactions list before rendering
   transactionsList.innerHTML = '';
 
-  const filterValue = filterType.value;
+  const typeFilter = filterType.value;
+  const categoryFilter = filterCategory.value;
+
   const filteredTransactions = allTransactions.filter(t => {
-    return filterValue === 'all' ? true : t.type === filterValue;
+    const typeMatch = typeFilter === 'all' ? true : t.type === typeFilter;
+    const categoryMatch = categoryFilter === 'all' ? true : t.category === categoryFilter;
+    return typeMatch && categoryMatch;
   });
 
   let balance = 0;
@@ -147,6 +168,10 @@ transactionsList.addEventListener('click', async (e) => {
  * Handle filter change to update displayed transactions
  */
 filterType.addEventListener('change', () => {
+  renderTransactions();
+});
+
+filterCategory.addEventListener('change', () => {
   renderTransactions();
 });
 
