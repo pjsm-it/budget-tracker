@@ -52,7 +52,7 @@ budget-tracker/
 
 1. Clone the repository:
 
-* git clone <repository-url>
+* git clone https://github.com/pjsm-it/budget-tracker.git
 * cd budget-tracker/backend
 
 2. Install dependencies:
@@ -62,6 +62,7 @@ budget-tracker/
 * npm start
 
 4. Open frontend/index.html in your browser (double click or via Live Server).
+https://pjsm-it.github.io/budget-tracker
 
 ---
 
@@ -73,6 +74,8 @@ npm run reset-db
 npm start
 
 This deletes the current budget.db and creates a new empty database when the server starts.
+
+Note: The SQLite database is temporary on the Render free plan. Data will reset automatically if the server restarts or after periods of inactivity. The project is prepared to support environment variables via .env, but for simplicity, this small portfolio project does not require them to run.
 
 ---
 
