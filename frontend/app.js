@@ -7,7 +7,8 @@ const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const totalBalance = document.getElementById('total-balance');
 
-const API_URL = 'http://localhost:3000/transactions';
+// const API_URL = 'http://localhost:3000/transactions';
+const API_URL = 'https://budget-tracker-api-2xib.onrender.com/transactions';
 
 // Global variable to store the transaction being edited
 let editingId = null;
