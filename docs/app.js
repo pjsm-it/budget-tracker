@@ -1,11 +1,14 @@
 /**
  * @file app.js
- * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements and delete confirmation
+ * @description Frontend logic for Budget Tracker MVP with Edit/Cancel enhancements, delete confirmation, and functional filters
  */
 
 const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const totalBalance = document.getElementById('total-balance');
+
+const filterType = document.getElementById('filter-type');
+const filterCategory = document.getElementById('filter-category');
 
 // const API_URL = 'http://localhost:3000/transactions';
 const API_URL = 'https://budget-tracker-api-2xib.onrender.com/transactions';
@@ -19,7 +22,7 @@ const submitButton = form.querySelector('button[type="submit"]');
 let cancelButton = null;
 
 /**
- * Fetch and display all transactions
+ * Fetch and display all transactions, applying filters if set
  */
 async function loadTransactions() {
   const res = await fetch(API_URL);
@@ -28,9 +31,21 @@ async function loadTransactions() {
   // Clear the transactions list before rendering
   transactionsList.innerHTML = '';
 
+  // Populate category filter dynamically
+  const categories = new Set();
+  transactions.forEach(t => categories.add(t.category));
+  updateCategoryFilter(Array.from(categories));
+
   let balance = 0;
 
-  transactions.forEach(t => {
+  // Apply filters
+  const filteredTransactions = transactions.filter(t => {
+    const typeMatch = filterType.value === 'all' || t.type === filterType.value;
+    const categoryMatch = filterCategory.value === 'all' || t.category === filterCategory.value;
+    return typeMatch && categoryMatch;
+  });
+
+  filteredTransactions.forEach(t => {
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${t.description} - ${t.category} - $${t.amount} (${t.type})</span>
@@ -44,6 +59,28 @@ async function loadTransactions() {
   });
 
   totalBalance.textContent = balance.toFixed(2);
+}
+
+/**
+ * @description Update category filter options dynamically
+ * @param {string[]} categories - Array of category strings
+ */
+function updateCategoryFilter(categories) {
+  const current = filterCategory.value;
+  filterCategory.innerHTML = '<option value="all">All</option>';
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    filterCategory.appendChild(option);
+  });
+
+  // Preserve previously selected category if still valid
+  if (categories.includes(current)) {
+    filterCategory.value = current;
+  } else {
+    filterCategory.value = 'all';
+  }
 }
 
 /**
@@ -134,6 +171,12 @@ transactionsList.addEventListener('click', async (e) => {
     }
   }
 });
+
+/**
+ * Handle filter changes to reload transactions
+ */
+filterType.addEventListener('change', loadTransactions);
+filterCategory.addEventListener('change', loadTransactions);
 
 // Initial load of transactions on page load
 loadTransactions();
